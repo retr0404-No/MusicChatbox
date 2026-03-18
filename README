@@ -1,0 +1,80 @@
+🎵 Music AI Chatbot - Persistencia con MySQL, Twilio y ngrok
+Este proyecto es un asistente de IA especializado en música desarrollado con FastAPI y el modelo Google Gemini. El sistema implementa una arquitectura de memoria contextual, utilizando una base de datos MySQL para registrar y recuperar el historial de conversaciones basado en el número de teléfono del usuario.
+
+🔐 Seguridad y Configuración
+El proyecto utiliza variables de entorno para proteger la privacidad. Nunca subas tu archivo .env a repositorios públicos.
+
+🛠️ Requisitos del Sistema
+Python 3.10+
+
+MySQL Server (Local o Remoto).
+
+ngrok: Para exponer el servidor local a internet.
+
+Cuenta de Twilio: Para la integración con WhatsApp.
+
+🔑 Obtención de API Keys
+Para que el bot procese los mensajes, se requiere una llave de Google Gemini:
+
+Visita el portal oficial: Google AI Studio - Get API Key.
+
+Deberás iniciar sesión con una cuenta de Google.
+
+Haz clic en "Create API key" y copia el código generado.
+
+Pega esta llave en tu archivo .env bajo la variable GEMINI_API_KEY.
+
+⚙️ Configuración de la cuenta de Twilio
+Para conectar el bot con WhatsApp:
+
+Registro: Crea una cuenta en Twilio usando un correo electrónico válido.
+
+Sandbox: Ve a Messaging > Try it Out > Send a WhatsApp Message.
+
+Conecta tu dispositivo siguiendo las instrucciones (enviando el código de activación por WhatsApp).
+
+🚀 Instalación Local
+1. Preparar el Entorno
+Bash
+
+# Instalar las librerías necesarias
+pip install -r requirements.txt
+2. Variables de Entorno (.env)
+Crea un archivo .env (basado en .env.example) y configura tus accesos:
+
+Plaintext
+
+DB_HOST=localhost
+DB_USER=tu_usuario
+DB_PASSWORD=tu_password
+DB_NAME=music_ai_db
+GEMINI_API_KEY=tu_api_key_de_google_ai_studio
+3. Base de Datos (MySQL)
+Ejecuta el siguiente script para inicializar las tablas. Se utiliza VARCHAR(50) para el teléfono para soportar el formato internacional de Twilio (whatsapp:+1...).
+
+SQL
+
+CREATE DATABASE music_ai_db;
+USE music_ai_db;
+
+CREATE TABLE Usuarios (
+    telefono VARCHAR(50) PRIMARY KEY,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Historial (
+    id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+    telefono_usuario VARCHAR(50),
+    rol ENUM('user', 'assistant'),
+    contenido TEXT,
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (telefono_usuario) REFERENCES Usuarios(telefono) ON DELETE CASCADE
+);
+🌐 Conexión Externa (ngrok)
+Inicia el programa: python main.py (Puerto 8000).
+
+Inicia ngrok: ngrok http 8000.
+
+Configura el Webhook: En la consola de Twilio (Sandbox Settings), pega la URL de ngrok seguida de /whatsapp.
+
+Ejemplo: https://tu-id-ngrok.ngrok-free.app/whatsapp
