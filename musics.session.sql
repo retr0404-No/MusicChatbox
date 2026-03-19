@@ -1,3 +1,4 @@
+CREATE DATABASE IF NOT EXISTS musichistory;
 USE musichistory;
 
 -- Crear tabla de Usuarios
