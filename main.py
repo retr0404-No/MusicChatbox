@@ -1,7 +1,7 @@
-# main.py - Servidor FastAPI para WhatsApp con IA de Gemini
-#Acuerdate en lo de ngrok poner el puerto 8000 para que funcione el webhook
-#el link de ngrok es el que debes poner en la configuración del webhook de Twilio, con la ruta /whatsapp al final (ejemplo: https://abc123.ngrok.io/whatsapp)
-#corre el archivo main.py
+# Primer proyecto de chatbot musical con IA generativa y persistencia en MySQL
+#COMP4480.ARTIFICIAL INTELLIGENCE
+
+#Importamos las librerías necesarias para la aplicación
 
 import os
 import mysql.connector
@@ -17,11 +17,6 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel('models/gemini-2.5-flash') # Actualizado a la versión estable
 
 # 2. CONFIGURACIÓN DE LA BASE DE DATOS
-"""
-Esta sección maneja la conexión con MySQL. 
-Asegúrate de que los datos de host, user y password 
-coincidan con tu configuración local.
-"""
 def conectar_db():
     try:
         connection = mysql.connector.connect(
@@ -51,12 +46,9 @@ def registrar_interaccion(telefono, rol, contenido):
         conn.commit()
         cursor.close()
         conn.close()
-
+        
+# Función para recuperar el historial de mensajes
 def obtener_memoria(telefono, limite=6):
-    """
-    Recupera los últimos mensajes para que la IA
-    tenga contexto de la conversación actual.
-    """
     conn = conectar_db()
     contexto = ""
     if conn:
@@ -64,7 +56,7 @@ def obtener_memoria(telefono, limite=6):
         query = "SELECT rol, contenido FROM Historial WHERE telefono_usuario = %s ORDER BY fecha_envio DESC LIMIT %s"
         cursor.execute(query, (telefono, limite))
         filas = cursor.fetchall()
-        # Invertimos para que el orden sea cronológico
+        
         for msg in reversed(filas):
             contexto += f"{msg['rol']}: {msg['contenido']}\n"
         cursor.close()
@@ -130,29 +122,3 @@ async def whatsapp_webhook(Body: str = Form(...), From: str = Form(...)):
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
     
-    
-    """
- NOTA: Para producción, considera usar un servidor ASGI como Daphne o Uvicorn con Gunicorn, y asegúrate de manejar la configuración de seguridad y escalabilidad adecuadamente.
-def obtener_o_crear_usuario(telefono):
-    conn = sqlite3.connect('music_bot.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT id FROM usuarios WHERE telefono = ?", (telefono,))
-    user = cursor.fetchone()
-    if not user:
-        cursor.execute("INSERT INTO usuarios (telefono) VALUES (?)", (telefono,))
-        conn.commit()
-        user_id = cursor.lastrowid
-    else:
-        user_id = user[0]
-    conn.close()
-    return user_id
-
-Función para guardar mensajes en el historial
-def guardar_mensaje(user_id, rol, contenido):
-    conn = sqlite3.connect('music_bot.db')
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO historial (usuario_id, rol, contenido) VALUES (?, ?, ?)", 
-                   (user_id, rol, contenido))
-    conn.commit()
-    conn.close()
-    """
