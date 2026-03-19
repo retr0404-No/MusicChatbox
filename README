@@ -1,4 +1,6 @@
 🎵 Music AI Chatbot - Persistencia con MySQL, Twilio y ngrok
+
+⚠️ NOTA PARA LA EVALUACIÓN: Este sistema requiere una instancia activa de MySQL para funcionar. El bot utiliza la base de datos para la gestión de usuarios y la memoria contextual. Si el servidor de base de datos no está disponible, el programa lanzará un error de conexión al iniciar.
 Este proyecto es un asistente de IA especializado en música desarrollado con FastAPI y el modelo Google Gemini. El sistema implementa una arquitectura de memoria contextual, utilizando una base de datos MySQL para registrar y recuperar el historial de conversaciones basado en el número de teléfono del usuario.
 
 🔐 Seguridad y Configuración
